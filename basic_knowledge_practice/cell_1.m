@@ -16,7 +16,6 @@ numericVector = cell2mat(numericCells)
 %% 使用花括号 {} 的内容索引
 last = C{2,3}
 C{2,3} = 300
+C{3,1} = 600
 
-% 将 C 的四个元胞的内容赋给四个变量(按列顺序赋值变量)
-[r1c1, r2c1, r1c2, r2c2] = C{1:2,1:2}
 
