@@ -55,15 +55,16 @@ Fpass = 370;
 Fstop = 430;
 Fs = 2000; 
 
-% Design method defaults to 'equiripple' when omitted
+% Design method defaults to 'equiripple' when omitted(等波纹设计法)
 deq = designfilt('lowpassfir','FilterOrder',N,'PassbandFrequency',Fpass,...
   'StopbandFrequency',Fstop,'SampleRate',Fs);
 
+%最小二乘法
 dls = designfilt('lowpassfir','FilterOrder',N,'PassbandFrequency',Fpass,...
   'StopbandFrequency',Fstop,'SampleRate',Fs,'DesignMethod','ls');
 
 hfvt = fvtool(deq,dls);
-legend(hfvt,'Equiripple design', 'Least-squares design')
+legend(hfvt,'Equiripple design等波纹设计法', 'Least-squares design最小二乘法')
 %%
 %在上述示例中，设计的滤波器在通带和阻带中具有相同的波纹。我们可以使用权重来减少其中一个频带内的波纹，同时保持滤波器阶数固定。
 % 例如，如果您希望阻带波纹是通带波纹的十分之一，则为阻带赋予的权重必须是通带权重的十倍。根据上述情况重新设计等波纹滤波器。
