@@ -1,15 +1,16 @@
-%补偿常量滤波器延迟如前所述，您可以测量滤波器的群延迟，以验证它是频率的常量函数。
+% 补偿常量滤波器延迟如前所述，您可以测量滤波器的群延迟，以验证它是频率的常量函数。
 % 您可以使用 grpdelay 函数来测量滤波器延迟 D，并通过在输入信号中追加 D 个零并按时间将输出信号偏移 D 个采样来补偿此延迟。
-%假设您要对含噪心电图信号进行滤波，以去除 75 Hz 以上的高频噪声。您要应用一个 FIR 低通滤波器并补偿滤波器延迟，以便含噪信号和经过滤波的信号正确对齐，并可以叠加绘图进行比较。
+% 假设您要对含噪心电图信号进行滤波，以去除 75 Hz 以上的高频噪声。您要应用一个 FIR 低通滤波器并补偿滤波器延迟，以便含噪信号和经过滤波的信号正确对齐，并可以叠加绘图进行比较。
 
-Fs = 500;                     % Sample rate in Hz
+Fs = 500;                     % Sample rate in Hz 采样率
 N  = 500;                     % Number of signal samples
-rng default;                  %控制随机数生成器 
-x = ecg(N)' + 0.25*randn(N,1); % Noisy waveform其中'代表转置
+rng default;                  % 控制随机数生成器 
+x = ecg(N)' + 0.25*randn(N,1); % Noisy waveform其中'代表转置，把数据x全部转化为列向量
 t = (0:N-1)/Fs;               % Time vector
     
-Fnorm = 75/(Fs/2);            % Normalized frequency归一化频率
+Fnorm = 75/(Fs/2);            % Normalized frequency归一化频率(截止频率)
 df = designfilt('lowpassfir','FilterOrder',70,'CutoffFrequency',Fnorm); %设计一个截止频率为 75 Hz 的 70 阶低通 FIR 滤波器。
+fvtool(df)  % 显示滤波器绘图
 
 grpdelay(df,2048,Fs)          % Plot group delaygr
 D = mean(grpdelay(df))        % Filter delay in samples平均值
@@ -18,12 +19,16 @@ D = mean(grpdelay(df))        % Filter delay in samples平均值
 %对数据进行滤波，并通过将输出信号偏移 D 个采样来补偿延迟。最后一步有效地消除了滤波器瞬变。
 Fs = 500;                        % Sample rate in Hz
 N  = 500;                        % Number of signal samples
-rng default;                     %控制随机数生成器 
+rng default;                     % 控制随机数生成器 
 x = ecg(N)' + 0.25*randn(N,1);   % Noisy waveform其中'代表转置
-t = (0:N-1)/Fs;                  % Time vector
+t = (0:N-1)/Fs;                  % Time vector时间向量
+Fnorm = 75/(Fs/2);   
+D = mean(grpdelay(df));
 
-y = filter(df,[x; zeros(D,1)]);  % Append D zeros to the input data
-y = y(D+1:end);                  % Shift data to compensate for delay
+df = designfilt('lowpassfir','FilterOrder',70,'CutoffFrequency',Fnorm); %设计一个截止频率为 75 Hz 的 70 阶低通 FIR 滤波器。
+
+y = filter(df,[x; zeros(D,1)]);  % Append D zeros to the input data向输入向量末尾追加D个0
+y = y(D+1:end);                  % Shift data to compensate for delay将输出信号偏移D个0开=来补偿延迟
 
 plot(t,x,t,y,'linewidth',1.5)    %同时显示原始的信号和进行时延补偿后的信号
 title('Filtered Waveforms')
@@ -41,7 +46,7 @@ axis tight
 %以上一节中定义的 ECG 信号为例。对此信号进行带延迟补偿和不带延迟补偿的滤波。设计一个截止频率为 75 Hz 的 7 阶低通 IIR 椭圆滤波器。
 Fs = 500;                     % Sample rate in Hz
 N  = 500;                     % Number of signal samples
-rng default;                  %控制随机数生成器 
+rng default;                  % 控制随机数生成器 
 x = ecg(N)' + 0.25*randn(N,1);% Noisy waveform其中'代表转置
 t = (0:N-1)/Fs;               % Time vector
 Fnorm = 75/(Fs/2);            % Normalized frequency
